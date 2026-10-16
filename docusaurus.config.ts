@@ -3,15 +3,40 @@ import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import { docOgRenderer, blogOgRenderer, pageOgRenderer } from './src/renderer/ImageRenderers';
 
+const defaultLocale = 'en';
+
+const locales = [
+    'en',
+    'ar',
+    'crp',
+    'cs',
+    'de',
+    'fr',
+    'it',
+    'ja',
+    'ru',
+    'tr',
+    'uk',
+    'zh-CN',
+];
+
+const customLocaleConfigs: Record<string, Record<string, any>> = {
+    crp: {
+        label: 'Crowdin',
+        direction: 'ltr',
+        htmlLang: 'crp',
+        calendar: 'gregory',
+        path: 'crp',
+    },
+};
+
 const config: Config = {
     title: 'GeyserMC',
     tagline: 'Revolutionize Your Minecraft Server',
     favicon: 'img/favicon.ico',
-    
+
     url: 'https://geysermc.org',
-    baseUrl: process.env.DOCUSAURUS_CURRENT_LOCALE && process.env.DOCUSAURUS_CURRENT_LOCALE !== 'en'
-        ? `/${process.env.DOCUSAURUS_CURRENT_LOCALE}/`
-        : '/',
+    baseUrl: '/',
 
     organizationName: 'GeyserMC',
     projectName: 'GeyserWebsite',
@@ -19,17 +44,17 @@ const config: Config = {
     onBrokenLinks: 'throw',
 
     i18n: {
-        defaultLocale: 'en',
-        locales: ['en', 'ar','crp', 'cs', 'de', 'fr', 'it', 'ja', 'ru', 'tr', 'uk', 'zh-CN'],
-        localeConfigs: {
-            crp: {
-                label: 'Crowdin',
-                direction: 'ltr',
-                htmlLang: 'crp',
-                calendar: 'gregory',
-                path: 'crp',
-            }
-        }
+        defaultLocale,
+        locales,
+        localeConfigs: Object.fromEntries(
+            locales.map((locale) => [
+                locale,
+                {
+                    ...customLocaleConfigs[locale],
+                    baseUrl: locale === defaultLocale ? '/' : `/${locale}/`,
+                },
+            ])
+        ),
     },
 
     markdown: {
@@ -38,22 +63,22 @@ const config: Config = {
             onBrokenMarkdownLinks: 'warn'
         },
         ...(process.env.DOCUSAURUS_CURRENT_LOCALE === 'crp' ? {
-        preprocessor: ({ fileContent }) => {
-            const lines = fileContent.split('\n');
+            preprocessor: ({ fileContent }) => {
+                const lines = fileContent.split('\n');
 
-            for (let i = 0; i < lines.length; i++) {
-                if (lines[i].startsWith('#')) {
-                    const lastOpenCurly = lines[i].lastIndexOf('{');
-                    const lastCloseCurly = lines[i].lastIndexOf('}');
-                    if (lastCloseCurly !== -1 && lastOpenCurly !== -1 && lastCloseCurly > lastOpenCurly) {
-                        const curly = lines[i].substring(lastOpenCurly, lastCloseCurly + 1);
-                        lines[i] = lines[i].replace(curly, '').replace('\\', '') + ' ' + curly;
+                for (let i = 0; i < lines.length; i++) {
+                    if (lines[i].startsWith('#')) {
+                        const lastOpenCurly = lines[i].lastIndexOf('{');
+                        const lastCloseCurly = lines[i].lastIndexOf('}');
+                        if (lastCloseCurly !== -1 && lastOpenCurly !== -1 && lastCloseCurly > lastOpenCurly) {
+                            const curly = lines[i].substring(lastOpenCurly, lastCloseCurly + 1);
+                            lines[i] = lines[i].replace(curly, '').replace('\\', '') + ' ' + curly;
+                        }
                     }
                 }
-            }
 
-            return lines.join('\n');
-        }
+                return lines.join('\n');
+            }
         } : {})
     },
 
@@ -123,8 +148,8 @@ const config: Config = {
                     { path: 'wiki', destination: 'docusaurus-plugin-content-docs/current' },
                     { path: 'blog', destination: 'docusaurus-plugin-content-blog' },
                 ],
-                jsonKeyExclusions: [ 
-                    'providers.provider.', 
+                jsonKeyExclusions: [
+                    'providers.provider.',
                     'sidebar.apiSidebar.',
                     'link.item.label.Geyser',
                     'link.item.label.Floodgate',
@@ -148,7 +173,7 @@ const config: Config = {
         {
             tagName: 'script',
             attributes: {
-              type: 'text/javascript',
+                type: 'text/javascript',
             },
             innerHTML: `
                 var _jipt = [];
@@ -162,8 +187,8 @@ const config: Config = {
         {
             tagName: 'script',
             attributes: {
-              type: 'text/javascript',
-              src: '//cdn.crowdin.com/jipt/jipt.js'
+                type: 'text/javascript',
+                src: '//cdn.crowdin.com/jipt/jipt.js'
             }
         }
     ] : [],
