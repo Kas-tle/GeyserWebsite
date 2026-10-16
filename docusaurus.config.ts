@@ -9,8 +9,9 @@ const config: Config = {
     favicon: 'img/favicon.ico',
     
     url: 'https://geysermc.org',
-    baseUrl: currentLocale !== 'en' ? `/${currentLocale}/` : '/',
-    
+    baseUrl: process.env.DOCUSAURUS_CURRENT_LOCALE && process.env.DOCUSAURUS_CURRENT_LOCALE !== 'en'
+        ? `/${process.env.DOCUSAURUS_CURRENT_LOCALE}/`
+        : '/',
 
     organizationName: 'GeyserMC',
     projectName: 'GeyserWebsite',

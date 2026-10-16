@@ -140,6 +140,7 @@ jobs:
         env:
           # The Mermaid theme makes the client bundle too large for Node's default heap
           NODE_OPTIONS: --max-old-space-size=8192
+          DOCUSAURUS_CURRENT_LOCALE: ${{ matrix.locales }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
